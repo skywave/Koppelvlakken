@@ -61,9 +61,6 @@ def storecurrect(row):
             destination = destination_meta[destination_id]
             row['DestinationName50'] = destination['DestinationName50']
             row['DestinationDetail24'] = destination['DestinationDetail24']
-    else:
-            row['DestinationName50'] = 'null'
-            row['DestinationDetail24'] = 'null'
 
     row['ExpectedArrivalTime'] = toisotime(row['OperationDate'], row['ExpectedArrivalTime'])
     row['ExpectedDepartureTime'] = toisotime(row['OperationDate'], row['ExpectedDepartureTime'])
@@ -108,7 +105,6 @@ def storecurrect(row):
         tpc_store[row['TimingPointCode']] = {id: row}
     else:
         tpc_store[row['TimingPointCode']][id] = row
-
 
 context = zmq.Context()
 
