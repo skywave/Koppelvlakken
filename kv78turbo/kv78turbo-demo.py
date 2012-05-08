@@ -10,11 +10,18 @@ line_store = {}
 journey_store = {}
 
 tpc_meta = {}
+destination_meta = {}
 
 f = open('timingpoint_wgs84.tsv', 'r')
 for row in f.read().split('\n')[:-1]:
     dataownercode, tpc, name, town, userstopcode, unknowncode ,x, y, stopareacode = row.split('\t')
     tpc_meta[tpc] = {'TimingPointName': name, 'TimingPointTown': town, 'X': float(x), 'Y': float(y), 'UserStopCode' : stopareacode}
+f.close()
+
+f = open('destination.tsv', 'r')
+for row in f.read().split('\n')[:-1]:
+    dataownercode, destinationcode, destinationname50, destinationname30, destinationname24, destinationname19, destinationname16, destinationdetail24, destinationdetail19, destinationdetail16, destinationdisplay16 = row.split('\t')
+    destination_meta[dataownercode + '_' + destinationcode] = {'DestinationName50': destinationname50, 'DestinationDetail24': destinationdetail24}
 f.close()
 
 def toisotime(operationdate, timestamp):
@@ -49,6 +56,15 @@ def storecurrect(row):
     id = '_'.join([row['DataOwnerCode'], row['LocalServiceLevelCode'], row['LinePlanningNumber'], row['JourneyNumber'], row['FortifyOrderNumber']])
     line_id = row['DataOwnerCode'] + '_' + row['LinePlanningNumber'] + '_' + row['LineDirection']
 
+    destination_id = row['DataOwnerCode'] + '_'  + row['DestinationCode']
+    if destination_id in destination_meta:
+            destination = destination_meta[destination_id]
+            row['DestinationName50'] = destination['DestinationName50']
+            row['DestinationDetail24'] = destination['DestinationDetail24']
+    else:
+            row['DestinationName50'] = 'null'
+            row['DestinationDetail24'] = 'null'
+
     row['ExpectedArrivalTime'] = toisotime(row['OperationDate'], row['ExpectedArrivalTime'])
     row['ExpectedDepartureTime'] = toisotime(row['OperationDate'], row['ExpectedDepartureTime'])
     
@@ -60,7 +76,7 @@ def storecurrect(row):
         row['IsTimingStop'] = (row['IsTimingStop'] == '1')
     except:
         raise
-
+    
     if line_id not in line_store:
         line_store[line_id] = { 'DataOwnerCode': row['DataOwnerCode'], 'Network': {}, 'Actuals': {} }
     
