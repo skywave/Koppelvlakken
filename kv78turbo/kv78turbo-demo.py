@@ -11,10 +11,10 @@ journey_store = {}
 
 tpc_meta = {}
 
-f = open('govi-februari-2012-wgs84.txt', 'r')
+f = open('timingpoint_wgs84.tsv', 'r')
 for row in f.read().split('\n')[:-1]:
-    tpc, name, town, x, y = row.split('|')
-    tpc_meta[tpc] = {'Name': name, 'Town': town, 'X': float(x), 'Y': float(y)}
+    dataownercode, tpc, name, town, userstopcode, unknowncode ,x, y, stopareacode = row.split('\t')
+    tpc_meta[tpc] = {'TimingPointName': name, 'TimingPointTown': town, 'X': float(x), 'Y': float(y), 'UserStopCode' : stopareacode}
 f.close()
 
 def toisotime(operationdate, timestamp):
