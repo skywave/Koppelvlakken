@@ -18,6 +18,7 @@ line_store = {}
 journey_store = {}
 
 tpc_meta = {}
+destination_meta = {}
 
 f = codecs.open('stops.txt', 'r', 'utf-8')
 reader = csv.reader(utf_8_encoder(f))
@@ -27,6 +28,12 @@ for row in reader:
         tpc_meta[tpc] = {'Name': name, 'Town': town, 'X': float(x), 'Y': float(y)}
     except:
         pass
+f.close()
+
+f = open('destination.tsv', 'r')
+for row in f.read().split('\n')[:-1]:
+    dataownercode, destinationcode, destinationname50, destinationname30, destinationname24, destinationname19, destinationname16, destinationdetail24, destinationdetail19, destinationdetail16, destinationdisplay16 = row.split('\t')
+    destination_meta[dataownercode + '_' + destinationcode] = {'DestinationName50': destinationname50}
 f.close()
 
 def toisotime(operationdate, timestamp, row):
@@ -64,6 +71,11 @@ def cleanup():
 def storecurrect(row):
     id = '_'.join([row['DataOwnerCode'], row['LocalServiceLevelCode'], row['LinePlanningNumber'], row['JourneyNumber'], row['FortifyOrderNumber']])
     line_id = row['DataOwnerCode'] + '_' + row['LinePlanningNumber'] + '_' + row['LineDirection']
+
+    destination_id = row['DataOwnerCode'] + '_'  + row['DestinationCode']
+    if destination_id in destination_meta:
+             destination = destination_meta[destination_id]
+             row['DestinationName50'] = destination['DestinationName50']
 
     row['ExpectedArrivalTime'] = toisotime(row['OperationDate'], row['ExpectedArrivalTime'], row)
     row['ExpectedDepartureTime'] = toisotime(row['OperationDate'], row['ExpectedDepartureTime'], row)
@@ -214,3 +226,4 @@ while True:
         garbage = 0
     else:
         garbage += 1
+
