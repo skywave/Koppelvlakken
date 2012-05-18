@@ -69,6 +69,13 @@ def cleanup():
                 del(journey_store[journey_id])
 
 def storecurrect(row):
+    journeynumber = int(row['JourneyNumber'])
+    if row['LineDirection'] == '0':
+      if (journeynumber % 2 == 0):
+               row['LineDirection'] = '2'
+      else:
+               row['LineDirection'] = '1'
+    
     id = '_'.join([row['DataOwnerCode'], row['LocalServiceLevelCode'], row['LinePlanningNumber'], row['JourneyNumber'], row['FortifyOrderNumber']])
     line_id = row['DataOwnerCode'] + '_' + row['LinePlanningNumber'] + '_' + row['LineDirection']
 
@@ -79,7 +86,7 @@ def storecurrect(row):
 
     row['ExpectedArrivalTime'] = toisotime(row['OperationDate'], row['ExpectedArrivalTime'], row)
     row['ExpectedDepartureTime'] = toisotime(row['OperationDate'], row['ExpectedDepartureTime'], row)
-    
+ 
     try:
         for x in ['JourneyNumber', 'FortifyOrderNumber', 'UserStopOrderNumber', 'NumberOfCoaches']:
             if x in row and row[x] is not None and row[x] != 'UNKNOWN':
